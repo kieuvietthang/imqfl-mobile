@@ -243,7 +243,6 @@ class _MovieDetailScreenState extends State<MovieDetailScreen>
       height: 250,
       child: Stack(
         children: [
-          // Video player or thumbnail
           if (_videoUrl != null)
             _buildVideoPlayer()
           else
