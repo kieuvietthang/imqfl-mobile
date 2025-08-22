@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+import 'package:iqiyi_fl/providers/auth_provider.dart';
 import 'dart:convert';
+import 'package:provider/provider.dart';
 import '../models/advertisement.dart';
 import '../services/auth_service.dart';
+import '../widgets/custom_snackbar_widget.dart';
 import '../widgets/loading.dart';
 
 class AdvertisementProvider with ChangeNotifier {
@@ -144,6 +147,7 @@ class AdvertisementProvider with ChangeNotifier {
   }) async {
     try {
       Loading.show(context);
+
       final res = await authApi.registerUser(
         name: name,
         email: email,
@@ -152,6 +156,7 @@ class AdvertisementProvider with ChangeNotifier {
       );
 
       if (res != null) {
+        context.read<AuthProvider>().login(res.data.accessToken);
         Loading.hide(context);
         context.go('/home');
       }
@@ -161,25 +166,39 @@ class AdvertisementProvider with ChangeNotifier {
     }
   }
 
-  Future<void> onLogin(
-      {required String email, required String password, required BuildContext context}) async {
+  Future<void> onLogin({
+    required String email,
+    required String password,
+    required BuildContext context,
+  }) async {
     try {
       Loading.show(context);
-      final res = await authApi.loginUser(
-        email: email,
-        password: password,
-      );
+      final res = await authApi.loginUser(email: email, password: password);
 
       if (res != null) {
         final token = res.data.accessToken;
+
+        final accessToken = await context.read<AuthProvider>().login(token);
         Loading.hide(context);
-        context.go('/home');
-        print('Login OK, token: $token');
+
+        if (accessToken) {
+          context.go('/home');
+        } else {
+          AppSnackbar.error(context, 'Không lưu được phiên đăng nhập');
+        }
       }
     } catch (e) {
       Loading.hide(context);
-      print('Login fail: $e');
+      AppSnackbar.error(context, 'Đăng nhập thất bại');
     }
+  }
+
+
+  void clear(){
+    confirmCtrl.clear();
+    emailCtrl.clear();
+    nameCtrl.clear();
+    passCtrl.clear();
   }
 
     @override

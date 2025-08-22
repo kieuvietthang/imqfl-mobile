@@ -1,5 +1,9 @@
 import 'dart:developer';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:iqiyi_fl/services/storage_service.dart';
+
+import '../widgets/custom_snackbar_widget.dart';
 
 class ApiClient {
   static const String baseUrl = 'http://160.30.21.68/api/v1';
@@ -21,14 +25,21 @@ class ApiClient {
     // Request interceptor for logging
     _dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) {
+        onRequest: (options, handler) async {
           log('[API] ${options.method.toUpperCase()} ${options.uri}');
+
+          final token = await StorageService.getToken();
+          if (token != null && token.isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+
           if (options.queryParameters.isNotEmpty) {
             log('[API] Params: ${options.queryParameters}');
           }
           if (options.data != null) {
             log('[API] Data: ${options.data}');
           }
+
           handler.next(options);
         },
         onResponse: (response, handler) {
@@ -39,23 +50,14 @@ class ApiClient {
         onError: (error, handler) {
           log('[API] Error: ${error.message}');
           log('[API] Error code: ${error.response?.statusCode}');
-          
           if (error.response != null) {
-            log('[API] Response status: ${error.response?.statusCode}');
             log('[API] Response data: ${error.response?.data}');
-            
-            if (error.response?.data is Map && 
-                error.response?.data['message'] != null) {
-              log('[API] Server error message: ${error.response?.data['message']}');
-            }
-          } else {
-            log('[API] Request made but no response: ${error.requestOptions}');
           }
-          
           handler.next(error);
         },
       ),
     );
+
   }
 
   // GET request
@@ -88,6 +90,7 @@ class ApiClient {
         data: data,
         queryParameters: queryParameters,
         options: options,
+
       );
     } catch (e) {
       rethrow;

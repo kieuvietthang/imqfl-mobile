@@ -235,6 +235,7 @@ class _AuthScreenState extends State<AuthScreen> {
       ),
     ).whenComplete(() {
       adProvider.setCheck(true);
+      adProvider.clear();
     });
   }
 
@@ -303,18 +304,30 @@ class _AuthScreenState extends State<AuthScreen> {
                   validator: adProvider.validatePassword,
                 ),
                 const SizedBox(height: 20),
-                FilledButton(
-                  onPressed: () {
+                InkWell(
+                  onTap: (){
                     adProvider.onLogin(
                       email: adProvider.emailCtrl.text,
                       password: adProvider.passCtrl.text,
                       context: context,
                     );
+
                   },
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  child: Container(
+                    alignment: Alignment.center,
+                    padding: EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.blue,
+                    ),
+                    child: Text(
+                      'Đăng nhập',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                  child: Text('Đăng nhập'),
                 ),
                 const SizedBox(height: 16),
                 Center(
@@ -329,7 +342,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         child: Text(
                           'Đăng kí ngay',
                           style: TextStyle(
-                            color: cs.primary,
+                            color: Colors.white,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -429,8 +442,8 @@ class _AuthScreenState extends State<AuthScreen> {
             validator: adProvider.validateConfirm,
           ),
           const SizedBox(height: 16),
-          FilledButton(
-            onPressed: () {
+          InkWell(
+            onTap: (){
               adProvider.onRegister(
                 name: adProvider.nameCtrl.text,
                 email: adProvider.emailCtrl.text,
@@ -439,11 +452,23 @@ class _AuthScreenState extends State<AuthScreen> {
                 context: context,
               );
             },
-            style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 14),
+            child: Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.symmetric(vertical: 14),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.blue,
+              ),
+              child: Text(
+                'Đăng kí',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-            child: const Text('Đăng Kí'),
           ),
+
         ],
       ),
     );
